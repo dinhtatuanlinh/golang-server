@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"golang-server/web"
 	"log"
-    "web"
+	"net/http"
 )
 
 func main() {
-
+	web.WebRouter()
     log.Fatal(http.ListenAndServe(":8081", nil))
 
 }
