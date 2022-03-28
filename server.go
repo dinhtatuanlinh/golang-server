@@ -1,13 +1,14 @@
 package main
 
 import (
-	"golang-server/web"
-	"log"
-	"net/http"
+	"fmt"
+	"time"
 )
 
 func main() {
-	web.WebRouter()
-    log.Fatal(http.ListenAndServe(":8081", nil))
+	t := time.Now()
+	fmt.Print(t)
+	//web.WebRouter()
+	//log.Fatal(http.ListenAndServe(":8081", nil))
 
 }
