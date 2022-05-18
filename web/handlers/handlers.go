@@ -1,0 +1,55 @@
+package handlers
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/go-chi/chi/v5"
+	"net/http"
+	"server/database"
+)
+
+type Handle interface {
+	Welcome(w http.ResponseWriter, r *http.Request)
+	Abc(w http.ResponseWriter, r *http.Request)
+	Articles(w http.ResponseWriter, r *http.Request)
+	NotFound(w http.ResponseWriter, r *http.Request)
+	Post(w http.ResponseWriter, r *http.Request)
+}
+type SendingJson struct {
+	Bar string
+}
+type Handlers struct {
+}
+
+func (h *Handlers) Welcome(w http.ResponseWriter, r *http.Request) {
+	db := database.GetConnectionInstance()
+	status := db.CheckTableExist("labs", "users", db.DB)
+	fmt.Println(status)
+
+	w.Write([]byte("welcome"))
+}
+
+func (h *Handlers) Abc(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	fmt.Println(id)
+	w.Write([]byte("welcome"))
+}
+
+func (h *Handlers) Articles(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+	w.Write([]byte("this is subRoute!!!"))
+}
+
+func (h *Handlers) NotFound(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
+	w.Write([]byte("route does not exist!!!!"))
+}
+
+func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
+	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
+	if err != nil {
+		w.Write([]byte("parse JSON err"))
+	}
+	w.WriteHeader(404)
+	w.Write(str)
+}
