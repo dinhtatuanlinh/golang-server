@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"server/configs"
+	"server/pkg/ulti"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -13,7 +14,7 @@ type DbManipulate interface {
 	CreateTable(schema string, name string, db *sql.DB)
 	CreateSchema(name string, db *sql.DB)
 	CheckTableExist(schema string, name string, db *sql.DB) (exist bool)
-	InsertIntoTable(schema string, tableName string, userData *UserData, db *sql.DB) (result bool)
+	InsertOneIntoTable(schema string, tableName string, userData *UserData, db *sql.DB) (result bool)
 }
 
 type dbManipulation struct {
@@ -31,7 +32,8 @@ func GetConnectionInstance() *dbManipulation {
 }
 
 func connection() *sql.DB {
-	c, err := configs.Conf()
+	var c *configs.Config
+	c, err := ulti.ReadFile("./configs/config_server.yaml")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -92,7 +94,7 @@ type UserData struct {
 	password   string
 }
 
-func (DbManipulation *dbManipulation) InsertIntoTable(schema string, tableName string, userData *UserData, db *sql.DB) (result bool) {
+func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, userData *UserData, db *sql.DB) (result bool) {
 	dt := time.Now()
 	query := fmt.Sprintf("INSERT INTO %s.%s (first_name, last_name, username, email, password, active, created_at) "+
 		"VALUES($1, $2, $3, $4, $5, $6, $7)", schema, tableName)

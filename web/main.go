@@ -1,8 +1,9 @@
 package web
 
 import (
-	"github.com/go-chi/chi/v5"
 	"server/web/handlers"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func Web(r *chi.Mux) {
@@ -10,6 +11,7 @@ func Web(r *chi.Mux) {
 
 	r.Get("/", h.Welcome)
 	r.Get("/abc/{id}", h.Abc)
+	r.Post("/register", h.Register)
 	r.NotFound(h.NotFound)
 
 	// create subroute
