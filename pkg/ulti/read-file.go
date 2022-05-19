@@ -6,16 +6,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func ReadFile(path string) (obj *interface{}, err error) {
+func ReadFile(path string) (result *interface{}, err error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, err
+		result = nil
+		return
 	}
-
+	var obj interface{}
 	err = yaml.Unmarshal(buf, &obj)
-	if err != nil {
-		return nil, err
-	}
-
-	return obj, nil
+	result = &obj
+	return
 }

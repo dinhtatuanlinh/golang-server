@@ -3,9 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
+	"net/http"
 )
 
 type Handle interface {
@@ -23,8 +22,9 @@ type Handlers struct {
 }
 
 func (h *Handlers) Welcome(w http.ResponseWriter, r *http.Request) {
-
-
+	//db := database.GetConnectionInstance()
+	//status := db.CheckTableExist("labs", "users", db.DB)
+	//fmt.Println(status)
 	w.Write([]byte("welcome"))
 }
 
@@ -54,7 +54,7 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
-	
+
 	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
 	if err != nil {
 		w.Write([]byte("parse JSON err"))

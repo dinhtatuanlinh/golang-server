@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"server/configs"
 	"server/pkg/ulti"
 	"time"
 
@@ -32,10 +31,12 @@ func GetConnectionInstance() *dbManipulation {
 }
 
 func connection() *sql.DB {
-	var c *configs.Config
-	c, err := ulti.ReadFile("./configs/config_server.yaml")
+
+	result, err := ulti.ReadFile("./configs/config_server.yaml")
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Println(result)
 	}
 	dbInfo := c.Config.Database.Environment
 
