@@ -3,8 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"net/http"
+	"server/database"
+	"server/usecases/account/register"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type Handle interface {
@@ -22,9 +25,9 @@ type Handlers struct {
 }
 
 func (h *Handlers) Welcome(w http.ResponseWriter, r *http.Request) {
-	//db := database.GetConnectionInstance()
-	//status := db.CheckTableExist("labs", "users", db.DB)
-	//fmt.Println(status)
+	// db := database.GetConnectionInstance()
+	// status := db.CheckTableExist("labs", "users", db.DB)
+	// fmt.Println(status)
 	w.Write([]byte("welcome"))
 }
 
@@ -54,6 +57,12 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
+	data := &database.UserData{}
+	data.Username = "abcdef"
+	data.Email = "linh@gmail.com"
+	data.Password = "123456a"
+
+	register.Register(data)
 
 	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
 	if err != nil {

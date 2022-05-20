@@ -4,11 +4,13 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"server/database"
+	"server/pkg/ulti"
+
+	"github.com/mitchellh/mapstructure"
 )
-type configs struct{
-	config struct{
-		salt string `yaml:"salt"`
-	} `yaml:"config"`
+type keys struct {
+	Secretkey string `yaml: "secretkey"`
+	Salt string `yaml: "salt"`
 }
 
 func hasher(str string) string {
@@ -17,9 +19,24 @@ func hasher(str string) string {
 	return hashedStr
 }
 func Register(data *database.UserData) {
-	db := database.GetConnectionInstance()
-	_ = db.CheckTableExist("labs", "users", db.DB)
 
-	data.password = hasher(data.password)
-	db.InsertOneIntoTable("labs", "users", data, db.DB)
+	k := &keys{}
+	result, err := ulti.ReadFile("./configs/key.yaml")
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		mapstructure.Decode(*result, k)
+	}
+	
+
+	db := database.GetConnectionInstance()
+	exist := db.CheckTableExist("labs", "users", db.DB)
+	if !exist {
+		fmt.Println("table is not existed")
+	}
+	data.Password = hasher(data.Password + k.Salt)
+	fmt.Println(data.Password)
+	r := db.InsertOneIntoTable("labs", "users", data, db.DB)
+	fmt.Println(r)
 }

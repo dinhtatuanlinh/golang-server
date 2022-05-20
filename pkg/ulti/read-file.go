@@ -14,6 +14,7 @@ func ReadFile(path string) (result *interface{}, err error) {
 	}
 	var obj interface{}
 	err = yaml.Unmarshal(buf, &obj)
+	
 	result = &obj
 	return
 }

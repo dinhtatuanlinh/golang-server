@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/mitchellh/mapstructure"
 )
 
 type DbManipulate interface {
@@ -23,25 +24,42 @@ type dbManipulation struct {
 var instance *dbManipulation
 
 func GetConnectionInstance() *dbManipulation {
-	DB := connection()
+	DB := Connection()
 	if instance == nil {
 		instance = &dbManipulation{DB: DB}
 	}
 	return instance
 }
 
-func connection() *sql.DB {
+type Config struct {
+	Config struct {
+		Database struct {
+			Environment struct {
+				POSTGRES_HOST string `yaml:"POSTGRES_HOST`
+				POSTGRES_DB       string `yaml:"POSTGRES_DB"`
+				POSTGRES_USER     string `yaml:"POSTGRES_USER"`
+				POSTGRES_PASSWORD string  `yaml:"POSTGRES_PASSWORD"`
+				Ports             int64  `yaml:"ports"`
+			} `yaml:"environment"`
+		} `yaml:"database"`
+	} `yaml:"config"`
+}
 
+func Connection() *sql.DB {
+
+	c := &Config{}
 	result, err := ulti.ReadFile("./configs/config_server.yaml")
+
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(result)
+		mapstructure.Decode(*result, c)
 	}
 	dbInfo := c.Config.Database.Environment
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable",
-		"localhost", dbInfo.Ports, dbInfo.POSTGRES_USER, dbInfo.POSTGRES_PASSWORD, dbInfo.POSTGRES_DB)
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	dbInfo.POSTGRES_HOST, dbInfo.Ports, dbInfo.POSTGRES_USER, dbInfo.POSTGRES_PASSWORD, dbInfo.POSTGRES_DB)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -81,28 +99,32 @@ func (DbManipulation *dbManipulation) CheckTableExist(schema string, name string
 		"SELECT EXISTS ( SELECT * FROM %s.%s)", schema, name)
 	_, err := db.Exec(query)
 	if err != nil {
+		fmt.Println(err)
 		exist = false
+		return
 	}
 	exist = true
 	return
 }
 
 type UserData struct {
-	first_name string
-	last_name  string
-	username   string
-	email      string
-	password   string
+	First_name string
+	Last_name  string
+	Username   string
+	Email      string
+	Password   string
 }
 
 func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, userData *UserData, db *sql.DB) (result bool) {
-	dt := time.Now()
+	now := time.Now()
+	dt := now.Format("01-02-2006 15:04:05")
 	query := fmt.Sprintf("INSERT INTO %s.%s (first_name, last_name, username, email, password, active, created_at) "+
-		"VALUES($1, $2, $3, $4, $5, $6, $7)", schema, tableName)
-	_, err := db.Exec(query, userData.first_name, userData.last_name, userData.username,
-		userData.email, userData.password, false, dt.Format("01-02-2006 15:04:05"))
+		"VALUES('%s', '%s', '%s', '%s', '%s', %v, '%s')", schema, tableName, userData.First_name, userData.Last_name, userData.Username,
+		userData.Email, userData.Password, false, dt)
+	_, err := db.Exec(query)
 	if err != nil {
 		result = false
+		return
 	}
 	result = true
 	return
