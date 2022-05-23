@@ -24,31 +24,51 @@ type dbManipulation struct {
 var instance *dbManipulation
 
 func GetConnectionInstance() *dbManipulation {
-	DB := Connection()
+	DB := connection()
 	if instance == nil {
 		instance = &dbManipulation{DB: DB}
+		CreateDatabase(instance, )
+		return instance
 	}
 	return instance
+}
+
+func CreateDatabase(DBM *dbManipulation, schema, table string) {
+	schemas := DBM.GetSchemas()
+	var existedSchema bool
+	for _, v := range schemas {
+		if schema == v {
+			existedSchema = true
+		}
+	}
+
+	if existedSchema == false {
+		DBM.CreateSchema(schema)
+	}
+
+	if DBM.CheckTableExist(schema, table) == false {
+		DBM.CreateTable(schema, table)
+	}
+
 }
 
 type Config struct {
 	Config struct {
 		Database struct {
 			Environment struct {
-				POSTGRES_HOST string `yaml:"POSTGRES_HOST`
+				POSTGRES_HOST     string `yaml:"POSTGRES_HOST`
 				POSTGRES_DB       string `yaml:"POSTGRES_DB"`
 				POSTGRES_USER     string `yaml:"POSTGRES_USER"`
-				POSTGRES_PASSWORD string  `yaml:"POSTGRES_PASSWORD"`
+				POSTGRES_PASSWORD string `yaml:"POSTGRES_PASSWORD"`
 				Ports             int64  `yaml:"ports"`
 			} `yaml:"environment"`
 		} `yaml:"database"`
 	} `yaml:"config"`
 }
 
-func Connection() *sql.DB {
-
+func connection() *sql.DB {
 	c := &Config{}
-	result, err := ulti.ReadFile("./configs/config_server.yaml")
+	result, err := ulti.ReadFileYaml("./configs/config_server.yaml")
 
 	if err != nil {
 		fmt.Println(err)
@@ -57,9 +77,8 @@ func Connection() *sql.DB {
 	}
 	dbInfo := c.Config.Database.Environment
 
-
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-	dbInfo.POSTGRES_HOST, dbInfo.Ports, dbInfo.POSTGRES_USER, dbInfo.POSTGRES_PASSWORD, dbInfo.POSTGRES_DB)
+		dbInfo.POSTGRES_HOST, dbInfo.Ports, dbInfo.POSTGRES_USER, dbInfo.POSTGRES_PASSWORD, dbInfo.POSTGRES_DB)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -67,8 +86,37 @@ func Connection() *sql.DB {
 	}
 	return db
 }
+func (DbManipulation *dbManipulation) GetSchemas() []string {
+	rows, err := DbManipulation.DB.Query("SELECT nspname FROM pg_catalog.pg_namespace")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var results = make([]string, 0)
+	for rows.Next() {
+		var schema string
+		if err := rows.Scan(&schema); err != nil {
+			panic(err)
+		}
+		results = append(results, schema)
+	}
+	return results
+}
 
-func (DbManipulation *dbManipulation) CreateTable(schema string, name string, db *sql.DB) {
+func (DbManipulation *dbManipulation) CreateTable(schema string, name string) {
+	count := 0
+	last := len(Tables["users"])
+	var tableFieldStr string
+	for i, v := range Tables["users"] {
+		count++
+		if count < last {
+			tableFieldStr += i + " " + v + ","
+		} else {
+			tableFieldStr += i + " " + v
+		}
+
+	}
+	fmt.Println(tableFieldStr)
 	query := fmt.Sprintf("CREATE TABLE %s.%s ("+
 		"id SERIAL,"+
 		"first_name text,"+
@@ -78,28 +126,27 @@ func (DbManipulation *dbManipulation) CreateTable(schema string, name string, db
 		"password text not null,"+
 		"active bool,"+
 		"created_at date not null)", schema, name)
-	result, err := db.Exec(query)
+	_, err := DbManipulation.DB.Exec(query)
 	if err != nil {
 		fmt.Println("creating table error")
 	}
-	fmt.Println(result)
+	fmt.Println("create users table successfully")
 }
 
-func (DbManipulation *dbManipulation) CreateSchema(name string, db *sql.DB) {
+func (DbManipulation *dbManipulation) CreateSchema(name string) {
 	query := fmt.Sprintf("CREATE SCHEMA %s", name)
-	result, err := db.Exec(query)
+	result, err := DbManipulation.DB.Exec(query)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(result)
 }
 
-func (DbManipulation *dbManipulation) CheckTableExist(schema string, name string, db *sql.DB) (exist bool) {
+func (DbManipulation *dbManipulation) CheckTableExist(schema string, name string) (exist bool) {
 	query := fmt.Sprintf(
 		"SELECT EXISTS ( SELECT * FROM %s.%s)", schema, name)
-	_, err := db.Exec(query)
+	_, err := DbManipulation.DB.Exec(query)
 	if err != nil {
-		fmt.Println(err)
 		exist = false
 		return
 	}
@@ -115,13 +162,13 @@ type UserData struct {
 	Password   string
 }
 
-func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, userData *UserData, db *sql.DB) (result bool) {
+func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, userData *UserData) (result bool) {
 	now := time.Now()
 	dt := now.Format("01-02-2006 15:04:05")
 	query := fmt.Sprintf("INSERT INTO %s.%s (first_name, last_name, username, email, password, active, created_at) "+
 		"VALUES('%s', '%s', '%s', '%s', '%s', %v, '%s')", schema, tableName, userData.First_name, userData.Last_name, userData.Username,
 		userData.Email, userData.Password, false, dt)
-	_, err := db.Exec(query)
+	_, err := DbManipulation.DB.Exec(query)
 	if err != nil {
 		result = false
 		return

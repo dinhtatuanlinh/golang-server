@@ -21,7 +21,7 @@ func hasher(str string) string {
 func Register(data *database.UserData) {
 
 	k := &keys{}
-	result, err := ulti.ReadFile("./configs/key.yaml")
+	result, err := ulti.ReadFileYaml("./configs/key.yaml")
 
 	if err != nil {
 		fmt.Println(err)
@@ -31,12 +31,8 @@ func Register(data *database.UserData) {
 	
 
 	db := database.GetConnectionInstance()
-	exist := db.CheckTableExist("labs", "users", db.DB)
-	if !exist {
-		fmt.Println("table is not existed")
-	}
+
 	data.Password = hasher(data.Password + k.Salt)
-	fmt.Println(data.Password)
-	r := db.InsertOneIntoTable("labs", "users", data, db.DB)
+	r := db.InsertOneIntoTable("labs", "users", data)
 	fmt.Println(r)
 }

@@ -7,13 +7,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 
+	"server/database"
 	"server/web"
 )
 
 
 func main() {
-
-
+	db := database.GetConnectionInstance()
+	database.CreateDatabase(db, )
 	r := chi.NewRouter()
 	
 	//set cors handler for all routes
