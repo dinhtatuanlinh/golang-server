@@ -1,7 +1,7 @@
 config:
   database:
     environment:
-      POSTGRES_HOST: 42.112.215
+      POSTGRES_HOST: 42.112.215.125
       POSTGRES_DB: labs
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgresql
