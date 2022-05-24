@@ -1,9 +1,9 @@
 config:
   database:
     environment:
-      POSTGRES_HOST: localhost
-      POSTGRES_DB: test_server
-      POSTGRES_USER: tester
-      POSTGRES_PASSWORD: password
-      ports: 3232
+      POSTGRES_HOST: 42.112.215
+      POSTGRES_DB: labs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresql
+      ports: 5432
 
