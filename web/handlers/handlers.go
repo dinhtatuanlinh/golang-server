@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"server/database"
-	"server/usecases/account/register"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -56,18 +54,18 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 	w.Write(str)
 }
 
-func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
-	data := &database.UserData{}
-	data.Username = "abcdef"
-	data.Email = "linh@gmail.com"
-	data.Password = "123456a"
+// func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
+// 	data := &database.UserData{}
+// 	data.Username = "abcdef"
+// 	data.Email = "linh@gmail.com"
+// 	data.Password = "123456a"
 
-	register.Register(data)
+// 	register.Register(data)
 
-	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
-	if err != nil {
-		w.Write([]byte("parse JSON err"))
-	}
-	w.WriteHeader(404)
-	w.Write(str)
-}
+// 	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
+// 	if err != nil {
+// 		w.Write([]byte("parse JSON err"))
+// 	}
+// 	w.WriteHeader(404)
+// 	w.Write(str)
+// }
