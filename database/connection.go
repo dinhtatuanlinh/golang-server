@@ -33,22 +33,43 @@ func GetConnectionInstance() *dbManipulation {
 	return instance
 }
 
-func CreateDatabase(DBM *dbManipulation, schema, table string) {
+func CreateDatabase(DBM *dbManipulation) {
+	var interfaceSchemas []interface{}
+	var requiredSchemas []string
+
 	schemas := DBM.GetSchemas()
-	var existedSchema bool
-	for _, v := range schemas {
-		if schema == v {
-			existedSchema = true
+	for _, v := range schemas{
+		interfaceSchemas = append(interfaceSchemas, v)
+	}
+	
+	for i, _ := range Tables {
+		requiredSchemas = append(requiredSchemas, i)
+	}
+
+	for _, v := range requiredSchemas{
+		ok := ulti.CheckElementExistingInArray(v, interfaceSchemas)
+		if !ok {
+			DBM.CreateSchema(v)
 		}
 	}
-
-	if existedSchema == false {
-		DBM.CreateSchema(schema)
+	
+	for _, v := range requiredSchemas{
+		fmt.Println(Tables[v])
 	}
+	
+	// for _, v := range schemas {
+	// 	if schemas == v {
+	// 		existedSchema = true
+	// 	}
+	// }
 
-	if DBM.CheckTableExist(schema, table) == false {
-		DBM.CreateTable(schema, table)
-	}
+	// if existedSchema == false {
+	// 	DBM.CreateSchema(schemas)
+	// }
+
+	// if DBM.CheckTableExist(schema, table) == false {
+	// 	DBM.CreateTable(schema, table)
+	// }
 
 }
 
@@ -104,19 +125,19 @@ func (DbManipulation *dbManipulation) GetSchemas() []string {
 }
 
 func (DbManipulation *dbManipulation) CreateTable(schema string, name string) {
-	count := 0
-	last := len(Tables["users"])
-	var tableFieldStr string
-	for i, v := range Tables["users"] {
-		count++
-		if count < last {
-			tableFieldStr += i + " " + v + ","
-		} else {
-			tableFieldStr += i + " " + v
-		}
+	// count := 0
+	// last := len(Tables["users"])
+	// var tableFieldStr string
+	// for i, v := range Tables["users"] {
+	// 	count++
+	// 	if count < last {
+	// 		tableFieldStr += i + " " + v + ","
+	// 	} else {
+	// 		tableFieldStr += i + " " + v
+	// 	}
 
-	}
-	fmt.Println(tableFieldStr)
+	// }
+	// fmt.Println(tableFieldStr)
 	query := fmt.Sprintf("CREATE TABLE %s.%s ("+
 		"id SERIAL,"+
 		"first_name text,"+

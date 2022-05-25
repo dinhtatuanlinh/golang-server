@@ -1,6 +1,9 @@
 package database
 
-var Tables = [string]map[string]map[string]string{
+var Tables = map[string]map[string]map[string]string{
+	"userschema": userSchema,
+}
+var userSchema = map[string]map[string]string{
 	"users": users,
 }
 var users = map[string]string{
