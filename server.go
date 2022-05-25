@@ -13,8 +13,9 @@ import (
 
 
 func main() {
-	db := database.GetConnectionInstance()
-	database.CreateDatabase(db)
+	// db := database.GetConnectionInstance()
+	database.Connection()
+	// database.CreateDatabase(db)
 	r := chi.NewRouter()
 	
 	//set cors handler for all routes
