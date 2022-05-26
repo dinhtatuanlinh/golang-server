@@ -1,20 +1,30 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 
-	"server/database"
 	"server/web"
 )
 
 
 func main() {
-	// db := database.GetConnectionInstance()
-	database.Connection()
+	// db := database.Connection()
+	// query := fmt.Sprintf(`insert into users (created_at, username, email, "password") values (?, ?, ?, ?)`)
+
+	// result := db.Exec(query, "asdfwefd", "e3rdfdsew", "refdsfsd", "asdfwefdscxv" )
+	// fmt.Println(*result)
+// 	rows, err := db.Raw("select name, age, email from users where name = ?", "jinzhu").Rows()
+// defer rows.Close()
+// for rows.Next() {
+//   rows.Scan(&name, &age, &email)
+
+//   // do something
+// }
 	// database.CreateDatabase(db)
 	r := chi.NewRouter()
 	
@@ -36,5 +46,6 @@ func main() {
 	
 	web.Web(r)
 	
-	http.ListenAndServe(":3000", r)
+	err := http.ListenAndServe(":3000", r)
+	fmt.Println(err)
 }
