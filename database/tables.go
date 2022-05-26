@@ -1,7 +1,11 @@
 package database
 
 import (
+<<<<<<< HEAD
 	"time"
+=======
+	"gorm.io/gorm"
+>>>>>>> 078786c8a6cecfb9ce3b577fce2a307c8d1f2449
 )
 
 var Tables = map[string]map[string]map[string]string{
@@ -22,14 +26,23 @@ var users = map[string]string{
 }
 
 type User struct {
+<<<<<<< HEAD
+=======
+	gorm.Model
+>>>>>>> 078786c8a6cecfb9ce3b577fce2a307c8d1f2449
 	ID         int `gorm:"primaryKey;autoIncrement"`
 	First_name string
 	Last_name  string
 	Username   string `gorm:"not null"`
 	Email      string `gorm:"not null"`
 	Password   string `gorm:"not null"`
+<<<<<<< HEAD
 	ActivedAt time.Time 
 	CreatedAt time.Time `gorm:"not null"`
+=======
+	ActivedAt string 
+	CreatedAt string `gorm:"not null"`
+>>>>>>> 078786c8a6cecfb9ce3b577fce2a307c8d1f2449
 	Status     string
 }
 // type ColumnType interface {
