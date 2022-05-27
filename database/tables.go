@@ -12,7 +12,8 @@ type User struct {
 	Username   string `gorm:"type: varchar(128); NOT NULL UNIQUE; default:null"`
 	Email      string `gorm:"type: varchar(128); NOT NULL UNIQUE; default:null"`
 	Password   string `gorm:"type: varchar(128); NOT NULL; default:null"`
-	ActivedAt  string
-	CreatedAt  string `gorm:"type: varchar(128); NOT NULL; default:null"`
+	Actived_at  string
+	Created_at  string `gorm:"type: varchar(128); NOT NULL; default:null"`
 	Status     string
 }
+

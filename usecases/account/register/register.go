@@ -6,6 +6,7 @@ import (
 	"server/database"
 	"server/pkg/ulti"
 
+	"github.com/fatih/structs"
 	"github.com/mitchellh/mapstructure"
 )
 type keys struct {
@@ -18,7 +19,12 @@ func hasher(str string) string {
 	hashedStr := fmt.Sprintf("%x", sha256.Sum256(byteStr))
 	return hashedStr
 }
-func Register(data *database.UserData) {
+type userData struct {
+	Name    string
+	ID      int32
+	Enabled bool
+}
+func Register(data database.User) {
 
 	k := &keys{}
 	result, err := ulti.ReadFileYaml("./configs/key.yaml")
@@ -28,11 +34,19 @@ func Register(data *database.UserData) {
 	} else {
 		mapstructure.Decode(*result, k)
 	}
-	
-
-	db := database.GetConnectionInstance()
 
 	data.Password = hasher(data.Password + k.Salt)
-	r := db.InsertOneIntoTable("labs", "users", data)
-	fmt.Println(r)
+
+	mapData := structs.Map(data)
+
+	db := database.GetConnectionInstance()
+	db.InsertOneIntoTable("abc", "users", mapData)
+
+	// defer rows.Close()
+	// for rows.Next() {
+	//   rows.Scan(&name, &age, &email)
+
+	//   // do something
+	// }
+	// fmt.Println(*r)
 }

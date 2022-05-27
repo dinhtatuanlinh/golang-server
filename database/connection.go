@@ -13,20 +13,21 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// type dbManipulation struct {
-// 	DB *gorm.DB
-// }
+type dbManipulation struct {
+	DbManipulate
+	DB *gorm.DB
+}
 
-// var instance *gorm.DB
+var instance *dbManipulation
 
-// func GetConnectionInstance() *gorm.DB {
-// 	DB := connection()
-// 	if instance == nil {
-// 		instance = DB
-// 		return instance
-// 	}
-// 	return instance
-// }
+func GetConnectionInstance() *dbManipulation {
+	DB := connection()
+	if instance == nil {
+		instance = &dbManipulation{DB: DB}
+		return instance
+	}
+	return instance
+}
 
 type Config struct {
 	Config struct {
@@ -42,7 +43,7 @@ type Config struct {
 	} `yaml:"config"`
 }
 
-func Connection() (db *gorm.DB) {
+func connection() (db *gorm.DB) {
 	c := &Config{}
 	result, err := ulti.ReadFileYaml("./configs/config_server.yaml")
 
@@ -80,3 +81,4 @@ func Connection() (db *gorm.DB) {
 
 	return
 }
+

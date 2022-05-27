@@ -11,7 +11,7 @@ func Web(r *chi.Mux) {
 
 	r.Get("/", h.Welcome)
 	r.Get("/abc/{id}", h.Abc)
-	// r.Post("/register", h.Register)
+	r.Post("/register", h.Register)
 	r.NotFound(h.NotFound)
 
 	// create subroute
