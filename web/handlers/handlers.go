@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"server/database"
-	"server/usecases/account/register"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -57,18 +55,38 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
+	var data user
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil{
+		w.Write([]byte("json decode err"))
+	}
+	
 
-	data := database.User{}
-	data.Username = "abcdef"
-	data.Email = "linh@gmail.com"
-	data.Password = "123456a"
+	if (data.Password != data.Repassword) {
+		res, err := json.Marshal(&response{Code: 500, Message: "password and repassword do not match!"})
+		if err != nil{
+			w.Write([]byte("parse JSON err"))
+		}
+		w.WriteHeader(404)
+		w.Write(res)
+	}
 
-	register.Register(data)
-
-	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
+	fmt.Println(data)
+	res, err := json.Marshal(&response{Code: 200, Message: "success!"})
 	if err != nil {
 		w.Write([]byte("parse JSON err"))
 	}
 	w.WriteHeader(404)
-	w.Write(str)
+	w.Write(res)
+}
+
+type user struct{
+	Username string `json:"username"`
+	Email string `json:"email"`
+	Password string `json:"password"`
+	Repassword string `json:"repassword"`
+}
+type response struct{
+	Code int
+	Message string
 }
