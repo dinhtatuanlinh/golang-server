@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"server/models"
+	"server/validation"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -57,30 +58,44 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	var data models.User
+	var resp models.Response
 	
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil{
 		w.Write([]byte("json decode err"))
 	}
-	
-	if (data.Password != data.Repassword) {
-		// resp.Code= 500
-		// resp.Message = "password and repassword do not match"
-		var resp  = models.Response{Code: 500, Message: "password and repassword do not match"}
-		res, err := json.Marshal(&resp)
-		if err != nil{
-			w.Write([]byte("parse JSON err"))
-		}
-		w.WriteHeader(404)
-		w.Write(res)
-	}
+
+	resp = validateRegData(data)
 
 	fmt.Println(data)
-	var resp  = models.Response{Code: 200, Message: "success"}
+
+	resp.Code = 200
+	resp.Message = "success"
+
 	res, err := json.Marshal(&resp)
 	if err != nil {
 		w.Write([]byte("parse JSON err"))
 	}
 	w.WriteHeader(404)
 	w.Write(res)
+}
+
+func validateRegData(data models.User) (resp models.Response){
+	var validate validation.Validation
+	if !validate.IsEmailValid(data.Email){
+		resp.Code = 500
+		resp.Message = "invalid email"
+	}
+
+	if !validate.ValidatePassword(data.Password, data.Repassword){
+		resp.Code = 500
+		resp.Message = "invalid password"
+	}
+
+	if !validate.IsUsernameValid(data.Username){
+		resp.Code = 500
+		resp.Message = "invalid username"
+	}
+
+	return
 }
