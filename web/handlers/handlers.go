@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"server/models"
+
 	"github.com/go-chi/chi/v5"
 )
 
@@ -16,9 +18,7 @@ type Handle interface {
 	Post(w http.ResponseWriter, r *http.Request)
 	Register(w http.ResponseWriter, r *http.Request)
 }
-type SendingJson struct {
-	Bar string
-}
+
 type Handlers struct {
 }
 
@@ -46,7 +46,8 @@ func (h *Handlers) NotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
-	str, err := json.Marshal(&SendingJson{Bar: "this route is in group!!"})
+	var resp  = models.SendingJson{Bar: "this route is in group!!"}
+	str, err := json.Marshal(&resp)
 	if err != nil {
 		w.Write([]byte("parse JSON err"))
 	}
@@ -55,15 +56,18 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
-	var data user
+	var data models.User
+	
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil{
 		w.Write([]byte("json decode err"))
 	}
 	
-
 	if (data.Password != data.Repassword) {
-		res, err := json.Marshal(&response{Code: 500, Message: "password and repassword do not match!"})
+		// resp.Code= 500
+		// resp.Message = "password and repassword do not match"
+		var resp  = models.Response{Code: 500, Message: "password and repassword do not match"}
+		res, err := json.Marshal(&resp)
 		if err != nil{
 			w.Write([]byte("parse JSON err"))
 		}
@@ -72,21 +76,11 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(data)
-	res, err := json.Marshal(&response{Code: 200, Message: "success!"})
+	var resp  = models.Response{Code: 200, Message: "success"}
+	res, err := json.Marshal(&resp)
 	if err != nil {
 		w.Write([]byte("parse JSON err"))
 	}
 	w.WriteHeader(404)
 	w.Write(res)
-}
-
-type user struct{
-	Username string `json:"username"`
-	Email string `json:"email"`
-	Password string `json:"password"`
-	Repassword string `json:"repassword"`
-}
-type response struct{
-	Code int
-	Message string
 }
