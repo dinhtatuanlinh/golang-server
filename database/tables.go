@@ -16,5 +16,6 @@ type User struct {
 	Actived_at  string
 	Created_at  string `gorm:"type: varchar(128); NOT NULL; default:null"`
 	Status     string
+	Delete_status string
 }
 

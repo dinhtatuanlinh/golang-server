@@ -9,7 +9,7 @@ type User struct {
 
 type Response struct {
 	Code    int
-	Message string
+	Message []string
 }
 
 type SendingJson struct {

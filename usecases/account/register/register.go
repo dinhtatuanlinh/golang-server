@@ -3,16 +3,14 @@ package register
 import (
 	"crypto/sha256"
 	"fmt"
+	"server/configs"
 	"server/database"
-	"server/pkg/ulti"
+	"server/pkg/utils"
 
 	"github.com/fatih/structs"
 	"github.com/mitchellh/mapstructure"
 )
-type keys struct {
-	Secretkey string `yaml: "secretkey"`
-	Salt string `yaml: "salt"`
-}
+
 
 func hasher(str string) string {
 	byteStr := []byte(str)
@@ -26,8 +24,8 @@ type userData struct {
 }
 func Register(data database.User) {
 
-	k := &keys{}
-	result, err := ulti.ReadFileYaml("./configs/key.yaml")
+	k := &configs.Keys{}
+	result, err := utils.ReadFileYaml("./configs/key.yaml")
 
 	if err != nil {
 		fmt.Println(err)

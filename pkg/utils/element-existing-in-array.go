@@ -1,4 +1,4 @@
-package ulti
+package utils
 
 func CheckElementExistingInArray(e interface{}, slice []interface{}) (ok bool) {
 	ok = false

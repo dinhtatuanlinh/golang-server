@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"server/pkg/ulti"
+	"server/pkg/utils"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -45,7 +45,7 @@ type Config struct {
 
 func connection() (db *gorm.DB) {
 	c := &Config{}
-	result, err := ulti.ReadFileYaml("./configs/config_server.yaml")
+	result, err := utils.ReadFileYaml("./configs/config_server.yaml")
 
 	if err != nil {
 		fmt.Println(err)
