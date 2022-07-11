@@ -18,17 +18,10 @@ import (
 // 	}
 // }
 
-func HttpResponse(w http.ResponseWriter, r *http.Request, data interface{}, responseNumber int) {
-	var response ResponseStruct
-	response.Data = data
-	response.Time = utils.Now(alias.GMT, alias.TIME_FORMAT)
-	resp, err := json.Marshal(response)
-	if err != nil {
-		return
-	}
+func HttpResponse(w http.ResponseWriter, r *http.Request, res []byte, responseNumber int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseNumber)
-	w.Write(resp)
+	w.Write(res)
 }
 
 func HttpResponseError4xx(w http.ResponseWriter, r *http.Request, data interface{}, responseNUmber int, codeNumber int) {

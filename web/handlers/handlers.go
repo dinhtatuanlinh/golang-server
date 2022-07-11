@@ -65,7 +65,6 @@ func (h *Handlers) Post(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	var body models.User
 	var resp models.Response
-	var data database.User
 	
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil{
@@ -74,12 +73,15 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 
 	resp = validateRegData(body)
 	if len(resp.Message) == 0 {
-		data.Username = body.Username
-		data.Email = body.Email
-		data.Password = body.Password
-		data.Created_at = utils.Now(alias.GMT, alias.TIME_FORMAT)
-		data.Status = "none"
-		data.Delete_status = "none"
+		data := database.User{
+			Username: body.Username,
+			Email: body.Email,
+			Password: body.Password,
+			Created_at: utils.Now(alias.GMT, alias.TIME_FORMAT),
+			Status: "none",
+			Delete_status: "none",
+		}
+
 		err := register.Register(data)
 		if err != nil{
 			resp.Code = 503
@@ -88,9 +90,39 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 			resp.Code = 200
 			resp.Message = append(resp.Message, "success")
 		}
-		
 	}
 
+	httpResp(w, r, resp)
+}
+
+func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
+	var body models.User
+	var resp models.Response
+
+	err := json.NewDecoder(r.Body).Decode(&body)
+	if err != nil{
+		w.Write([]byte("json decode err"))
+	}
+
+	data := database.User{
+		Username: body.Username,
+		Email: body.Email,
+		Password: body.Password,
+	}
+
+	result := register.Login(data)
+	if result.Username == ""{
+		resp.Code = 200
+		resp.Message = append(resp.Message, "user not existed")
+	}else{
+		resp.Code = 200
+		resp.Message = append(resp.Message, "success!!")
+	}
+
+	httpResp(w, r, resp)
+}
+
+func httpResp(w http.ResponseWriter, r *http.Request, resp models.Response) {
 	res, err := json.Marshal(&resp)
 	if err != nil {
 		w.Write([]byte("parse JSON err"))
@@ -104,11 +136,6 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	case 503:
 		template.HttpResponse(w, r, res, alias.HTTP_SERVICEUNAVAILABLE)
 	}
-	
-}
-
-func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
-
 }
 
 func validateRegData(data models.User) (resp models.Response){

@@ -28,7 +28,7 @@ func Register(data database.User) (err error) {
 	result, e := utils.ReadFileYaml("./configs/key.yaml")
 
 	if e != nil {
-		fmt.Println(err)
+		fmt.Println(e)
 	} else {
 		mapstructure.Decode(*result, k)
 	}
@@ -40,5 +40,22 @@ func Register(data database.User) (err error) {
 	db := database.GetConnectionInstance()
 	err = db.InsertOneIntoTable("abc", "users", mapData)
 
+	return
+}
+
+func Login(data database.User) (result database.User) {
+	k := &configs.Keys{}
+	res, e := utils.ReadFileYaml("./configs/key.yaml")
+
+	if e != nil {
+		fmt.Println(e)
+	} else {
+		mapstructure.Decode(*res, k)
+	}
+
+	data.Password = hasher(data.Password + k.Salt)
+
+	db := database.GetConnectionInstance()
+	result = db.SelectUserFromTable("abc", "users", data)
 	return
 }

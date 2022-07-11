@@ -35,10 +35,16 @@ func (DbManipulation *dbManipulation) createDataString(data map[string]interface
 }
 func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, data map[string]interface{}) (err error){
 	dataStr, columnNameStr := DbManipulation.createDataString(data)
-	// DbManipulation.createDataString(data)
+
 	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, tableName, columnNameStr, dataStr)
 	tx := DbManipulation.DB.Debug().Exec(query)
 	err = tx.Error
+	return
+}
+
+func (DbManipulation *dbManipulation) SelectUserFromTable(schema string, tableName string, data User) (result User){
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE Username = '%s' AND Password = '%s'`, tableName, data.Username, data.Password)
+	DbManipulation.DB.Raw(query).Scan(&result)
 	return
 }
 

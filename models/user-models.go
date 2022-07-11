@@ -1,10 +1,10 @@
 package models
 
 type User struct {
-	Username   string `json:"username"`
-	Email      string `json:"email"`
+	Username   string `json:"username", omitempty`
+	Email      string `json:"email", omitempty`
 	Password   string `json:"password"`
-	Repassword string `json:"repassword"`
+	Repassword string `json:"repassword", omitempty`
 }
 
 type Response struct {
