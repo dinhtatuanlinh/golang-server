@@ -23,6 +23,7 @@ type Handle interface {
 	NotFound(w http.ResponseWriter, r *http.Request)
 	Post(w http.ResponseWriter, r *http.Request)
 	Register(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request)
 }
 
 type Handlers struct {
@@ -79,9 +80,15 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		data.Created_at = utils.Now(alias.GMT, alias.TIME_FORMAT)
 		data.Status = "none"
 		data.Delete_status = "none"
-		register.Register(data)
-		resp.Code = 200
-		resp.Message = append(resp.Message, "success")
+		err := register.Register(data)
+		if err != nil{
+			resp.Code = 503
+			resp.Message = append(resp.Message, "err insert database")
+		} else{
+			resp.Code = 200
+			resp.Message = append(resp.Message, "success")
+		}
+		
 	}
 
 	res, err := json.Marshal(&resp)
@@ -94,8 +101,14 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		template.HttpResponse(w, r, res, alias.HTTP_OK)
 	case 500:
 		template.HttpResponse(w, r, res, alias.HTTP_BADREQUEST)
+	case 503:
+		template.HttpResponse(w, r, res, alias.HTTP_SERVICEUNAVAILABLE)
 	}
 	
+}
+
+func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func validateRegData(data models.User) (resp models.Response){

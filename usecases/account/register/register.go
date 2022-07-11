@@ -22,12 +22,12 @@ type userData struct {
 	ID      int32
 	Enabled bool
 }
-func Register(data database.User) {
+func Register(data database.User) (err error) {
 
 	k := &configs.Keys{}
-	result, err := utils.ReadFileYaml("./configs/key.yaml")
+	result, e := utils.ReadFileYaml("./configs/key.yaml")
 
-	if err != nil {
+	if e != nil {
 		fmt.Println(err)
 	} else {
 		mapstructure.Decode(*result, k)
@@ -38,13 +38,7 @@ func Register(data database.User) {
 	mapData := structs.Map(data)
 
 	db := database.GetConnectionInstance()
-	db.InsertOneIntoTable("abc", "users", mapData)
+	err = db.InsertOneIntoTable("abc", "users", mapData)
 
-	// defer rows.Close()
-	// for rows.Next() {
-	//   rows.Scan(&name, &age, &email)
-
-	//   // do something
-	// }
-	// fmt.Println(*r)
+	return
 }

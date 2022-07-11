@@ -1,9 +1,13 @@
 config:
   database:
     environment:
-      POSTGRES_HOST: 183.80.198.210
-      POSTGRES_DB: labs
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgresql
+      POSTGRES_HOST: 0.0.0.0
+      POSTGRES_DB: local
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      # POSTGRES_HOST: 183.80.198.210
+      # POSTGRES_DB: labs
+      # POSTGRES_USER: postgres
+      # POSTGRES_PASSWORD: postgresql
       ports: 5432
 

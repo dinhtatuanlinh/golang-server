@@ -11,7 +11,7 @@ type Validation struct {
 }
 
 func (v Validation) ValidatePassword(password, repassword string) bool {
-	var emailRegex = regexp.MustCompile("^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$")
+	// var emailRegex = regexp.MustCompile("^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$")
 
 	if password != repassword {
 		return false
@@ -20,8 +20,8 @@ func (v Validation) ValidatePassword(password, repassword string) bool {
 	if (len(password) < 6 && len(password) > 20){
 		return false
 	}
-
-	return emailRegex.MatchString(password)
+	return true
+	// return emailRegex.MatchString(password)
 }
 
 func (v Validation) IsEmailValid(e string) bool {

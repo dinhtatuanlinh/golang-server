@@ -33,12 +33,12 @@ func (DbManipulation *dbManipulation) createDataString(data map[string]interface
 	
 	return strings.TrimSuffix(dataStr, ","), strings.TrimSuffix(columnNameStr, ",")
 }
-func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, data map[string]interface{}) (result *gorm.DB){
+func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableName string, data map[string]interface{}) (err error){
 	dataStr, columnNameStr := DbManipulation.createDataString(data)
 	// DbManipulation.createDataString(data)
-	query := fmt.Sprintf(`INSERT INTO %s(%s) VALUES (%s)`, tableName, columnNameStr, dataStr)
-	DbManipulation.DB.Raw(query).Scan(&result)
-	fmt.Println(*result)
+	query := fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, tableName, columnNameStr, dataStr)
+	tx := DbManipulation.DB.Debug().Exec(query)
+	err = tx.Error
 	return
 }
 
