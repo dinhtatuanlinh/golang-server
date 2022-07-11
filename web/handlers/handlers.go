@@ -85,7 +85,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		err := register.Register(data)
 		if err != nil{
 			resp.Code = 503
-			resp.Message = append(resp.Message, "err insert database")
+			resp.Message = append(resp.Message, err.Error())
 		} else{
 			resp.Code = 200
 			resp.Message = append(resp.Message, "success")
@@ -110,7 +110,11 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		Password: body.Password,
 	}
 
-	result := register.Login(data)
+	result, err := register.Login(data)
+	if err != nil{
+		resp.Code = 500
+		resp.Message = append(resp.Message, err.Error())
+	}
 	if result.Username == ""{
 		resp.Code = 200
 		resp.Message = append(resp.Message, "user not existed")

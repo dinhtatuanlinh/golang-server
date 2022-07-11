@@ -42,6 +42,16 @@ func (DbManipulation *dbManipulation) InsertOneIntoTable(schema string, tableNam
 	return
 }
 
+func (DbManipulation *dbManipulation) UsernameEmailIsExisted(schema string, tableName string, data User) bool {
+	var result User
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE Username = '%s' OR Email = '%s'`, tableName, data.Username, data.Email)
+	DbManipulation.DB.Raw(query).Scan(&result)
+	if result.Username == ""{
+		return false
+	}
+	return true
+}
+
 func (DbManipulation *dbManipulation) SelectUserFromTable(schema string, tableName string, data User) (result User){
 	query := fmt.Sprintf(`SELECT * FROM %s WHERE Username = '%s' AND Password = '%s'`, tableName, data.Username, data.Password)
 	DbManipulation.DB.Raw(query).Scan(&result)

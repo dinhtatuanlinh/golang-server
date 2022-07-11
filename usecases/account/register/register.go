@@ -2,6 +2,7 @@ package register
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"server/configs"
 	"server/database"
@@ -38,17 +39,21 @@ func Register(data database.User) (err error) {
 	mapData := structs.Map(data)
 
 	db := database.GetConnectionInstance()
-	err = db.InsertOneIntoTable("abc", "users", mapData)
 
+	if db.UsernameEmailIsExisted("abc", "users", data){
+		return errors.New("username or email exsited")
+	}
+
+	err = db.InsertOneIntoTable("abc", "users", mapData)
 	return
 }
 
-func Login(data database.User) (result database.User) {
+func Login(data database.User) (result database.User, err error) {
 	k := &configs.Keys{}
-	res, e := utils.ReadFileYaml("./configs/key.yaml")
+	res, err := utils.ReadFileYaml("./configs/key.yaml")
 
-	if e != nil {
-		fmt.Println(e)
+	if err != nil {
+		return 
 	} else {
 		mapstructure.Decode(*res, k)
 	}
